@@ -7,7 +7,7 @@ import useStyles from './styles';
 
 const Form = ({ currentId, setCurrentId }) => {
     const classes = useStyles();
-    const [postData, setPostData] = useState({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
+    const [postData, setPostData] = useState({ creator: '', title: '', message: '', tags: '', selectedFile: '', createdAt: '' });
     const dispatch = useDispatch();
     const post = useSelector((state) => currentId ? state.posts.find((p) => p._id === currentId): null);
 
@@ -22,7 +22,7 @@ const Form = ({ currentId, setCurrentId }) => {
         if (currentId) {
             dispatch(updatePost(currentId, postData))
         } else {
-            dispatch(createPost(postData));
+            dispatch(createPost({...postData, createdAt: new Date()}));
         }
         
         clear();
@@ -30,7 +30,7 @@ const Form = ({ currentId, setCurrentId }) => {
 
     const clear = () => {
         setCurrentId(null);
-        setPostData({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
+        setPostData({ creator: '', title: '', message: '', tags: '', selectedFile: '', createdAt: '' });
     }
 
     return (
