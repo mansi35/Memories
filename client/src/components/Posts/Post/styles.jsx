@@ -49,4 +49,9 @@ export default makeStyles({
     display: 'flex',
     justifyContent: 'space-between',
   },
+  likeButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  }
 });
