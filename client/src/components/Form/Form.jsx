@@ -20,13 +20,13 @@ const Form = ({ currentId, setCurrentId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (currentId) {
-      dispatch(updatePost(currentId, { ...postData, name: user?.result.name }))
+    if (currentId === 0) {
+      dispatch(createPost({ ...postData, name: user?.result?.name }))
+        .then(() => clear());
     } else {
-      dispatch(createPost({ ...postData, name: user?.result.name }));
+      dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }))
+        .then(() => clear());
     }
-
-    clear();
   }
 
   const clear = () => {
