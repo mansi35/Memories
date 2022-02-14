@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Container, Grid, Grow, Paper, AppBar, TextField, Button } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ChipInput from 'material-ui-chip-input';
 import { useDispatch } from 'react-redux';
-import { getPosts, getPostsBySearch } from '../../actions/posts';
+import { getPostsBySearch } from '../../actions/posts';
 import Paginate from '../Pagination/Pagination';
 import Form from '../Form/Form';
 import Posts from '../Posts/Posts';
@@ -21,13 +22,22 @@ const Home = () => {
   const navigate = useNavigate();
   const page = query.get('page') || 1;
   const searchQuery = query.get('searchQuery');
+  const tagsQuery = query.get('tags');
   const [search, setSearch] = useState('');
   const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    if (tagsQuery || searchQuery) {
+      const searchq = searchQuery.toString();
+      const tagsq = tagsQuery.toString();
+      dispatch(getPostsBySearch({ search: searchq, tags: tagsq }));
+    }
+  }, []);
 
   const searchPost = () => {
     if (search.trim() || tags) {
       dispatch(getPostsBySearch({ search, tags: tags.join(',') }));
-      navigate(`/posts/search?searchQuery=${search || 'none'}&tags=${tags.join(',') || 'none'}`);
+      navigate(`/posts/search?searchQuery=${search || 'none'}&tags=${tags.join(',')}`);
     } else {
       navigate('/');
     }
@@ -72,9 +82,11 @@ const Home = () => {
               <Button onClick={searchPost} className={classes.searchButton} variant='contained' color='primary'>Search</Button>
             </AppBar>
             <Form currentId={currentId} setCurrentId={setCurrentId} />
-            <Paper className={classes.pagination} elevation={6}>
-              <Paginate page={page} />
-            </Paper>
+            {(!searchQuery && !tags.length) && (
+              <Paper className={classes.pagination} elevation={6}>
+                <Paginate page={page} />
+              </Paper>
+            )}
           </Grid>
         </Grid>
       </Container>

@@ -9,7 +9,7 @@ const Form = ({ currentId, setCurrentId }) => {
   const classes = useStyles();
   const [postData, setPostData] = useState({ title: '', message: '', tags: '', selectedFile: '' });
   const dispatch = useDispatch();
-  const post = useSelector((state) => currentId ? state.posts.find((message) => message._id === currentId) : null);
+  const post = useSelector((state) => currentId ? state.posts.posts.find((message) => message._id === currentId) : null);
   const user = JSON.parse(localStorage.getItem('profile'));
 
   useEffect(() => {
@@ -17,16 +17,15 @@ const Form = ({ currentId, setCurrentId }) => {
   }, [post]);
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (currentId === 0) {
-      dispatch(createPost({ ...postData, name: user?.result?.name }))
-        .then(() => clear());
+      dispatch(createPost({ ...postData, name: user?.result?.name }));
     } else {
-      dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }))
-        .then(() => clear());
+      dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }));
     }
+    clear();
   }
 
   const clear = () => {
@@ -35,9 +34,8 @@ const Form = ({ currentId, setCurrentId }) => {
   }
 
   if (!user?.result?.name) {
-    console.log('here');
     return (
-      <Paper className={classes.paper}>
+      <Paper className={classes.paper} elevation={6}>
         <Typography variant="h6" align="center">
           Please Sign In to create your own memories and like other's memories.
         </Typography>
@@ -46,7 +44,7 @@ const Form = ({ currentId, setCurrentId }) => {
   }
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} elevation={6}>
       <form autoComplete='off' noValidate className={`${classes.form} ${classes.root}`} onSubmit={handleSubmit}>
         <Typography variant='h6'>{currentId ? 'Editing' : 'Creating'} a Memory</Typography>
         <TextField name='title' variant='outlined' label='Title' fullWidth value={postData.title} onChange={(e) => setPostData({ ...postData, title: e.target.value })} />
