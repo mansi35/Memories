@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardActions, CardContent, CardMedia, Button, Typography, ButtonBase } from '@material-ui/core';
@@ -16,18 +16,30 @@ const Post = ({ post, setCurrentId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('profile'));
+  const [likes, setLikes] = useState(post?.likes);
+  const userId = user?.result?.googleId || user?.result?._id;
+  const hasLikedPost = post.likes.find((like) => like === (userId));
 
   const openPost = (e) => {
     navigate(`/posts/${post._id}`);
   };
 
+  const handleLike = () => {
+    dispatch(likePost(post._id));
+    if (hasLikedPost) {
+      setLikes(post.likes.filter((id) => id !== (userId)));
+    } else {
+      setLikes([...post.likes, userId]);
+    }
+  };
+
   const Likes = () => {
-    if (post.likes.length > 0) {
-      return post.likes.find((like) => like === (user?.result?.googleId || user?.result?._id))
+    if (likes.length > 0) {
+      return likes.find((like) => like === (userId))
         ? (
-          <span className={classes.likeButton}><ThumbUpAltIcon fontSize="small" />&nbsp;{post.likes.length > 2 ? `You and ${post.likes.length - 1} others` : `${post.likes.length} like${post.likes.length > 1 ? 's' : ''}`}</span>
+          <span className={classes.likeButton}><ThumbUpAltIcon fontSize="small" />&nbsp;{likes.length > 2 ? `You and ${likes.length - 1} others` : `${likes.length} like${likes.length > 1 ? 's' : ''}`}</span>
         ) : (
-          <span className={classes.likeButton}><ThumbUpAltOutlined fontSize="small" />&nbsp;{post.likes.length} {post.likes.length === 1 ? 'Like' : 'Likes'}</span>
+          <span className={classes.likeButton}><ThumbUpAltOutlined fontSize="small" />&nbsp;{likes.length} {likes.length === 1 ? 'Like' : 'Likes'}</span>
         );
     }
 
@@ -53,7 +65,7 @@ const Post = ({ post, setCurrentId }) => {
               e.stopPropagation();
               setCurrentId(post._id);
             }}>
-              <MoreHorizIcon fontSize='default' />
+              <MoreHorizIcon fontSize='medium' />
             </Button>
           </div>
         )}
@@ -66,7 +78,7 @@ const Post = ({ post, setCurrentId }) => {
         </CardContent>
       </ButtonBase>
       <CardActions className={classes.cardActions}>
-        <Button size='small' color='primary' disabled={!user} onClick={() => dispatch(likePost(post._id))}>
+        <Button size='small' color='primary' disabled={!user} onClick={handleLike}>
           <Likes />
         </Button>
         {(user?.result?.googleId === post?.creator || user?.result?._id === post?.creator) && (
